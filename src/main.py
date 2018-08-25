@@ -1,5 +1,5 @@
 from argparse import ArgumentParser
-from timer import Timer
+from stopwatch import Stopwatch
 
 def parse_args():
     """
@@ -13,5 +13,16 @@ def parse_args():
 
 if __name__ == '__main__':
     parse_args()
-    timer = Timer()
-    timer.display_timer()
+    stopwatch = Stopwatch()
+    print("Stopwatch is ready, press 's' to start, 'x' to stop and 'y' to save and exit")
+    while True:
+        command = input()
+        if command == 'y':
+            stopwatch.save()
+            break
+        elif command == 's':
+            stopwatch.start()
+        elif command == 'x':
+            stopwatch.stop()
+        else:
+            print("Invalid input please press 's' to start, 'x' to stop and 'y' to save and exit")
