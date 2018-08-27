@@ -1,5 +1,6 @@
 from argparse import ArgumentParser
 from stopwatch import Stopwatch
+from database_manager import Database
 
 
 def start_timer():
@@ -18,16 +19,21 @@ def start_timer():
             print("Invalid input please press 's' to start, 'x' to stop and 'y' to save and exit")
 
 def manage_args(args):
+    database = Database()
+    database.start()
     if args.new_job is not None:
         print(args.new_job)
         #create new job and start session
-    elif args.job is not None and (args.period is None and args.earnings is None):
+    elif args.job is not None and (args.period is None and not args.earnings):
         print(args.job)
         #start session
-    elif args.earnings is not None or args.period is not None:
+    elif args.earnings or args.period is not None:
         print(str(args.earnings) + " " + str(args.period))
         #Display stats
         # if job is none show all earnings and or periods
+    else:
+        print("Something went wrong somewhere")
+    database.close()
     pass
 
 def define_args():
