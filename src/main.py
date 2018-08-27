@@ -17,7 +17,20 @@ def start_timer():
         else:
             print("Invalid input please press 's' to start, 'x' to stop and 'y' to save and exit")
 
-def parse_args():
+def manage_args(args):
+    if args.new_job is not None:
+        print(args.new_job)
+        #create new job and start session
+    elif args.job is not None and (args.period is None and args.earnings is None):
+        print(args.job)
+        #start session
+    elif args.earnings is not None or args.period is not None:
+        print(str(args.earnings) + " " + str(args.period))
+        #Display stats
+        # if job is none show all earnings and or periods
+    pass
+
+def define_args():
     """
     default: Show jobs and total time spent on them
     -job: which job do I want to time (Open up timer, but don't start it)
@@ -30,24 +43,31 @@ def parse_args():
 
     -period (if job is given display all recorded time, or in specified period)
     -earnings (if job is given display earnings, if not give total for all jobs)
-
     """
     parser = ArgumentParser(description = "Work session manager, manage projects with a timer and get statistics about time spent")
 
-    parser.add_argument("-n", "--new_job", nargs="2",
+    parser.add_argument("-n", "--new_job",
+    nargs=2,
     help="Name of a new job you're starting, specify name and hourly rate")
 
     parser.add_argument("-p", "--period",
+    nargs=2,
     help="The period you want time spent from, date or month is fine")
 
     parser.add_argument("-e", "--earnings",
-    help="The earning you want from given job and or period")
+    action= "store_true",
+    help="The money you've earned from given job and or period")
 
     parser.add_argument("-j", "--job",
     help="The job you want to start recording time for")
 
-    arguments = parser.parse_args()
+    return parser.parse_args()
 
 
 if __name__ == '__main__':
-    parse_args()
+    args = define_args()
+    manage_args(args)
+    #parse arguments
+    #if getting info
+    #   query result
+    #print result
