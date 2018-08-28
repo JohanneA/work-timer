@@ -21,9 +21,11 @@ def start_timer():
 def manage_args(args):
     database = Database()
     database.start()
+    database.create_tables()
+
     if args.new_job is not None:
         print(args.new_job)
-        #create new job and start session
+
     elif args.job is not None and (args.period is None and not args.earnings):
         print(args.job)
         #start session
@@ -33,8 +35,8 @@ def manage_args(args):
         # if job is none show all earnings and or periods
     else:
         print("Something went wrong somewhere")
+
     database.close()
-    pass
 
 def define_args():
     """

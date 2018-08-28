@@ -8,7 +8,7 @@ A command line work timer that can record time spent on a job and calculate earn
 ### To do list
 
  * [x] Timer functionality
- * [ ] Argument parsing
+ * [x] Argument parsing
  * [ ] Storing time
  * [ ] Getting time and time periods
  * [ ] Calculating earnings
