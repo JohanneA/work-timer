@@ -12,3 +12,5 @@ A command line work timer that can record time spent on a job and calculate earn
  * [ ] Storing time
  * [ ] Getting time and time periods
  * [ ] Calculating earnings
+ * [ ] List stored jobs
+ * [ ] Exit condition without saving time/session

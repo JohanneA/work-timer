@@ -1,16 +1,18 @@
 from argparse import ArgumentParser
 from stopwatch import Stopwatch
 from database_manager import Database
+from database_manager import Session
+from datetime import date
 
 
-def start_timer():
+def start_stopwatch():
     stopwatch = Stopwatch()
     print("Stopwatch is ready, press 's' to start, 'x' to stop and 'y' to save and exit")
     while True:
         command = input()
         if command == 'y':
-            stopwatch.save()
-            break
+            time = stopwatch.save()
+            return time
         elif command == 's':
             stopwatch.start()
         elif command == 'x':
@@ -18,21 +20,37 @@ def start_timer():
         else:
             print("Invalid input please press 's' to start, 'x' to stop and 'y' to save and exit")
 
+def want_to_save():
+    print("Do you wan to store this session? y/n ")
+    if(input().lower() == 'y'):
+        return True
+    else:
+        print("Session won't be saved")
+        return False
+
 def manage_args(args):
     database = Database()
     database.start()
-    database.create_tables()
 
     if args.new_job is not None:
         print(args.new_job)
+        database.create_new_job(args.new_job)
 
     elif args.job is not None and (args.period is None and not args.earnings):
-        print(args.job)
-        #start session
+        today = date.today()
+        time = start_stopwatch()
+
+        session = Session(args.job, today, time)
+        
+        if want_to_save():
+            database.store_session(session)
+
     elif args.earnings or args.period is not None:
         print(str(args.earnings) + " " + str(args.period))
-        #Display stats
-        # if job is none show all earnings and or periods
+        if args.job == None:
+            database.get_stats(args.earnings, args.period)
+        else:
+            database.get_stats(args.job, args.earnings, args.period)
     else:
         print("Something went wrong somewhere")
 

@@ -16,8 +16,12 @@ class Database:
     def close(self):
         self.connection.close()
 
-    def create_new_job(self, name):
-        pass
+    def create_new_job(self, data):
+        sql = "INSERT INTO jobs(name, salary) VALUES(?,?)"
+
+        cur = self.connection.cursor()
+        cur.execute(sql, data)
+
 
     def get_stats(self, earnings, period):
         pass
@@ -38,6 +42,7 @@ class Database:
 
 
 class Session:
-    def __init__(self, date, time):
-        self.date = date#get today's date
+    def __init__(self, name, date, time):
+        self.name = name
+        self.date = date
         self.time = time
