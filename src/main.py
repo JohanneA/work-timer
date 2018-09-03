@@ -31,17 +31,22 @@ def want_to_save():
 def manage_args(args):
     database = Database()
     database.start()
+    database.create_tables()
 
     if args.new_job is not None:
         print(args.new_job)
+        args.new_job[1] = int(args.new_job[1])
         database.create_new_job(args.new_job)
+
+    elif args.list:
+        database.list_jobs()
 
     elif args.job is not None and (args.period is None and not args.earnings):
         today = date.today()
         time = start_stopwatch()
 
         session = Session(args.job, today, time)
-        
+
         if want_to_save():
             database.store_session(session)
 
@@ -78,7 +83,7 @@ def define_args():
 
     parser.add_argument("-p", "--period",
     nargs=2,
-    help="The period you want time spent from, date or month is fine")
+    help="The period you want time spent from, dd/mm/yyyy")
 
     parser.add_argument("-e", "--earnings",
     action= "store_true",
@@ -86,6 +91,10 @@ def define_args():
 
     parser.add_argument("-j", "--job",
     help="The job you want to start recording time for")
+
+    parser.add_argument("-l", "--list",
+    action= "store_true",
+    help="List all existing jobs")
 
     return parser.parse_args()
 
