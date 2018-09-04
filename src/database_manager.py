@@ -1,6 +1,7 @@
 import sqlite3 as db
 from sqlite3 import Error
 from os import path
+from datetime import datetime
 
 class Database:
     def __init__(self):
@@ -31,17 +32,48 @@ class Database:
         for row in cur:
             print("- {:s}, {:.2f}".format(row[1], row[2]))
 
+    def parse_period(self, period):
+        print(period)
+        if period is None:
+            past = '2018-01-01 00:00:00'
+            future = '2050-12-31 00:00:00'
+            return [past, future]
+        else:
+            format = '%d/%m/%Y'
+            try:
+                return [datetime.strptime(period[0], format), datetime.strptime(period[1], format)]
+            except:
+                print("Invalid period")
 
-    def get_stats(self, earnings, period):
-        pass
+
+    def get_stats(self, job, earnings, period):
+        sql = "SELECT jobs.name, jobs.salary, SUM(sessions.seconds) FROM jobs JOIN sessions ON jobs.id = sessions.job_id WHERE sessions.session_date >= Datetime(?) AND sessions.session_date <= Datetime(?)"
+        parsed_period = self.parse_period(period)
+
+        cur = self.connection.cursor()
+        cur.execute(sql, parsed_period)
+        result = cur.fetchone()
+
+        if job is not None:
+            output = ["", ""]
+            if earnings:
+                output[0] = result[2]/3600 * result[1] #Total hours multiplied by hourly rate
+            if period is not None:
+                m, s = divmod(result[2], 60)
+                h, m = divmod(m, 60)
+                output[1] = "{:d}:{:02d}:{:02d}".format(h, m, s)
+            print("{:s} {:s} {:.2f}".format(job, output[1], output[0]))
+
+        #If earnings is true, print earnings
+        #If period is not none, print period
 
     def get_job_id(self, job_name):
         sql = "SELECT id FROM jobs WHERE name = ?"
 
         cur = self.connection.cursor()
         cur.execute(sql, [job_name])
+
         result = cur.fetchone()[0]
-        print(result)
         if not result == None:
             return result
 
@@ -52,7 +84,6 @@ class Database:
     def store_session(self, session):
         sql = "INSERT INTO sessions (job_id, session_date, seconds) VALUES(?,?,?)"
         data = self.parse_data(session)
-        print(data)
 
         cur = self.connection.cursor()
         cur.execute(sql, data)

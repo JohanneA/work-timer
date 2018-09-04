@@ -2,9 +2,9 @@
 
 ##### Session table
 * id, int, primary key,
-* name, String, foreign key
+* job_id, int, foreign key
 * session_date, date
-* time, int (seconds)
+* seconds, int (seconds)
 
 ##### Job table
 * id, int, primary key
