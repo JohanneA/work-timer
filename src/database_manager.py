@@ -33,7 +33,6 @@ class Database:
             print("- {:s}, {:.2f}".format(row[1], row[2]))
 
     def parse_period(self, period):
-        print(period)
         if period is None:
             past = '2018-01-01 00:00:00'
             future = '2050-12-31 00:00:00'
@@ -47,25 +46,34 @@ class Database:
 
 
     def get_stats(self, job, earnings, period):
-        sql = "SELECT jobs.name, jobs.salary, SUM(sessions.seconds) FROM jobs JOIN sessions ON jobs.id = sessions.job_id WHERE sessions.session_date >= Datetime(?) AND sessions.session_date <= Datetime(?)"
+        sql = ""
+        data = []
+        if job is not None:
+            sql = "SELECT jobs.name, jobs.salary, SUM(sessions.seconds) FROM jobs JOIN sessions ON jobs.id = sessions.job_id WHERE jobs.name = ? AND sessions.session_date >= Datetime(?) AND sessions.session_date <= Datetime(?)"
+            data.append(job)
+        else:
+            sql = "SELECT jobs.name, jobs.salary, SUM(sessions.seconds) FROM jobs JOIN sessions ON jobs.id = sessions.job_id WHERE sessions.session_date >= Datetime(?) AND sessions.session_date <= Datetime(?) GROUP BY jobs.name"
+
         parsed_period = self.parse_period(period)
+        data.append(parsed_period[0])
+        data.append(parsed_period[1])
 
         cur = self.connection.cursor()
-        cur.execute(sql, parsed_period)
-        result = cur.fetchone()
+        cur.execute(sql, data)
 
-        if job is not None:
+        for row in cur:
             output = ["", ""]
             if earnings:
-                output[0] = result[2]/3600 * result[1] #Total hours multiplied by hourly rate
+                output[0] = "{:.2f}".format(row[2]/3600 * row[1]) #Total hours multiplied by hourly rate
             if period is not None:
-                m, s = divmod(result[2], 60)
+                m, s = divmod(row[2], 60)
                 h, m = divmod(m, 60)
                 output[1] = "{:d}:{:02d}:{:02d}".format(h, m, s)
-            print("{:s} {:s} {:.2f}".format(job, output[1], output[0]))
 
-        #If earnings is true, print earnings
-        #If period is not none, print period
+            if job is not None:
+                print("{:s} {:s} {:s}".format(job, output[1], output[0]))
+            else:
+                print("{:s} {:s} {:s}".format(row[0], output[1], str(output[0])))
 
     def get_job_id(self, job_name):
         sql = "SELECT id FROM jobs WHERE name = ?"

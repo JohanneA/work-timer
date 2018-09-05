@@ -51,9 +51,6 @@ def manage_args(args):
             database.store_session(session)
 
     elif args.earnings or args.period is not None:
-        if args.job == None:
-            database.get_stats(args.earnings, args.period)
-        else:
             database.get_stats(args.job, args.earnings, args.period)
     else:
         print("Something went wrong somewhere")
